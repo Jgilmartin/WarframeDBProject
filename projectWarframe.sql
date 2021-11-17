@@ -230,3 +230,24 @@ UPDATE warframe_release
     SET wf_release = '1842-05-05'
 WHERE wf_id = 1;
 SELECT * FROM warframe_release WHERE wf_id = 1;
+
+SELECT "---BEFORE DELETE---";
+--SELECT * FROM warframe_speed;
+SELECT warframe.wf_id, warframe.wf_name,  warframe.wf_ranked, warframe_speed.wf_speed
+FROM warframe
+INNER JOIN warframe_speed
+ON warframe.wf_id = warframe_speed.wf_id
+WHERE warframe.wf_id >=0;
+
+DELETE FROM warframe_speed
+WHERE wf_id = 3;
+
+--SELECT * FROM warframe_speed WHERE wf_id = 3;
+SELECT "---AFTER DELETE---";
+--SELECT * FROM warframe_speed;
+SELECT warframe.wf_id, warframe.wf_name,  warframe.wf_ranked, warframe_speed.wf_speed
+FROM warframe
+INNER JOIN warframe_speed
+ON warframe.wf_id = warframe_speed.wf_id
+WHERE warframe.wf_id >=0;
+
