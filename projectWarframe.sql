@@ -61,7 +61,7 @@ CREATE TABLE warframe_speed (
 
 
 CREATE TABLE loadouts( 
-    l_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    l_id, 
     l_name, l_primaryWeapon, l_secondaryWeapon, l_meleeWeapon, l_warframe,
     FOREIGN KEY (l_primaryWeapon) REFERENCES weaponsP(wp_id) ON DELETE CASCADE
     FOREIGN KEY (l_secondaryWeapon) REFERENCES weaponsP(wp_id) ON DELETE CASCADE
@@ -208,16 +208,19 @@ ON warframe.wf_id = warframe_speed.wf_id;
 
 --Display weaponsP Table
 SELECT "---Primary Weapons---";
-SELECT * from weaponsP;
+SELECT * FROM weaponsP;
 
 SELECT "---Secondary Weapons---";
+SELECT * FROM weaponsS;
+
 
 --CREATE LOADOUTS
-INSERT INTO loadouts (l_name,l_primaryWeapon, l_secondaryWeapon, l_warframe) VALUES('firstLoadout', 1, 3, 1); 
-INSERT INTO loadouts (l_name,l_primaryWeapon, l_secondaryWeapon, l_warframe) VALUES('secondLoadout', 3, 1, 3);
+INSERT INTO loadouts (l_name,l_primaryWeapon, l_secondaryWeapon, l_warframe) VALUES('Loadout 1', 1, 3, 1); 
+INSERT INTO loadouts (l_name,l_primaryWeapon, l_secondaryWeapon, l_warframe) VALUES('Loadout 2', 3, 1, 4);
+INSERT INTO loadouts (l_name, l_primaryWeapon, l_secondaryWeapon, l_warframe) VALUES ('Loadout 3', 12, 2, 5);
 
 
-
+SELECT "---Loadouts---";
 SELECT l_id, l_name, primaryW.wp_name, secondaryW.wp_name as Secondary, warframe.wf_name
 FROM loadouts, weaponsP as primaryW, weaponsS as secondaryW, warframe
 WHERE primaryW.wp_id = l_primaryWeapon
@@ -230,3 +233,30 @@ UPDATE warframe_release
     SET wf_release = '1842-05-05'
 WHERE wf_id = 1;
 SELECT * FROM warframe_release WHERE wf_id = 1;
+
+
+SELECT "---Search by Damage Types---";
+SELECT wp_name, wp_DamageTypes
+FROM weaponsP
+WHERE wp_DamageTypes = 'impact';
+
+SELECT "---Sort by Highest Fire Rate and Rate > 4---";
+SELECT wp_name, wp_fireRate
+FROM weaponsP
+WHERE wp_fireRate > 4
+ORDER BY wp_fireRate DESC;
+
+SELECT "---Warframes with Shields higher than 200---";
+SELECT warframe.wf_name, warframe_shields.wf_shields
+FROM warframe, warframe_shields
+WHERE wf_shields > 200
+AND warframe_shields.wf_id = warframe.wf_id;
+
+SELECT "---Loadouts with warframes having HP higher than 200---";
+SELECT DISTINCT l_id, l_name, primaryW.wp_name, secondaryW.wp_name as Secondary, warframe.wf_name
+FROM loadouts, weaponsP as primaryW, weaponsS as secondaryW, warframe, warframe_health
+WHERE primaryW.wp_id = l_primaryWeapon
+AND secondaryW.wp_id = l_secondaryWeapon
+AND warframe.wf_id = l_warframe
+AND warframe_health.wf_id = l_warframe
+AND warframe_health.wf_health > 200;
