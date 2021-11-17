@@ -223,3 +223,10 @@ FROM loadouts, weaponsP as primaryW, weaponsS as secondaryW, warframe
 WHERE primaryW.wp_id = l_primaryWeapon
 AND secondaryW.wp_id = l_secondaryWeapon
 AND warframe.wf_id = l_warframe;
+
+SELECT "---Updated---";
+
+UPDATE warframe_release
+    SET wf_release = '1842-05-05'
+WHERE wf_id = 1;
+SELECT * FROM warframe_release WHERE wf_id = 1;
