@@ -279,3 +279,5 @@ INNER JOIN warframe_speed
 ON warframe.wf_id = warframe_speed.wf_id
 WHERE warframe.wf_id >=0;
 
+UPDATE loadouts SET l_primaryweapon = 't1', l_secondaryWeapon = 't', l_meleeWeapon = 't', l_warframe = 't'
+WHERE l_name = 'Loadout 1';
