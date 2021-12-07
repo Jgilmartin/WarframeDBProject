@@ -1,9 +1,11 @@
 from sqlite3 import dbapi2
 import PySimpleGUI as sg
 import sqlite3 as db
+
+sg.theme("DarkAmber")
 #------Database Initialization----------
-conn = db.connect('warframeDB.sqlite')
-conn.row_factory = lambda cursor, row: None
+conn = db.connect('warframeproject.sqlite')
+conn.row_factory = lambda cursor, row: row[0]
 c = conn.cursor()
 allLoadouts = c.execute('SELECT l_name FROM loadouts').fetchall()
 primaryWeapons = c.execute('SELECT wp_name FROM weaponsP').fetchall()
@@ -22,13 +24,16 @@ layout1 = [[sg.Text('Loadout Select')],*[[sg.Combo(allLoadouts, key = 'allLoadou
             [sg.Text('WarframeSelect', enable_events=True)], *[[sg.Combo(warframeNames, key = 'warframeSelect', enable_events=True)]], 
             [sg.Button('UpdateLoadout')]]
 
+
 layout2 = [[sg.Text('Weapon Editor ')],
            *[[sg.Combo(allWeapons, key = 'editedWeapon', enable_events=True)]],
+           [sg.Text("Enter new value:", size = (15,1)), sg.Input(key='weaponEdit')],
            [sg.Button('UpdateWeapon')],
            [sg.Button('AddWeapon')],
 
            [sg.Text('Warframe Editor ')],
            *[[sg.Combo(warframeNames, key = 'editedWarframe', enable_events=True)]],
+           [sg.Text("Enter new value:", size = (15,1)), sg.Input(key='warframeEdit')],
            [sg.Button('UpdateWarframe')],
            [sg.Button('AddWaframe')]]
 
@@ -86,6 +91,7 @@ while True:
         print('Primary Weapon Selected: ' + values['primarySelect'])
         print('Secondary Weapon Selected: ' + values['secondarySelect'])
         print('Melee Weapon Selected: ' + values['meleeSelect'])
+        sg.popup('Loadout', "Primary weapon: " + values['primarySelect'] +"\nSecondary Weapon: "+ values['secondarySelect'] +"\nMelee Weapon: "+ values['meleeSelect'] +"\nWarframe: "+ values['warframeSelect'] +"\nLoadout Number: "+values['allLoadouts'])
 
     elif event == 'editedWeapon':
         pass
