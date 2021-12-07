@@ -14,9 +14,11 @@ meleeWeapons = c.execute('SELECT wp_name FROM weaponsM').fetchall()
 warframeNames = c.execute('SELECT DISTINCT wf_name FROM warframe').fetchall()
 allWeapons = meleeWeapons + primaryWeapons + secondaryWeapons
 
+allItems = allWeapons + warframeNames
+filteredResult = allItems
 
 
-# ----------- Create the 3 layouts this Window will display -----------
+# ----------- Create various layouts this Window will display -----------
 layout1 = [[sg.Text('Loadout Select')],*[[sg.Combo(allLoadouts, key = 'allLoadouts', enable_events=True)]], 
             [sg.Text('Primary Weapon Select')],*[[sg.Combo(primaryWeapons, key = 'primarySelect', enable_events=True)]],
             [sg.Text('Secondary Weapon Select')],*[[sg.Combo(secondaryWeapons, key = 'secondarySelect', enable_events=True)]],
@@ -53,11 +55,13 @@ ItemViewAndFilters =[[sg.Text('Item View and Filters')],
                     [sg.Text('Sort By'), sg.Button('Name', key = 'f_Name'), sg.Button('Damage Type', key = 'f_DamageType'), sg.Button('Fire Rate', key = 'f_FireRate'), sg.Button('Noise', key = 'f_Noise')],
                     [sg.Text('Filter By: '), sg.Checkbox('Warfames', key = 'f_Warframes'), sg.Checkbox('Weapons', key = 'f_Weapons'), sg.Checkbox('Primary', key = 'f_Primary'), sg.Checkbox('Secondary', key = 'f_Secondary'), sg.Checkbox('Melee', key = 'f_Melee')],
                     [sg.Text('Damge Type '), sg.Checkbox('electric', key = 'f_Electric'), sg.Checkbox('heat', key = 'f_Heat'), sg.Checkbox('magnetic', key = 'f_Magnetic'), sg.Checkbox('radiation', key = 'f_Radiation'), sg.Checkbox('slash', key = 'f_Slash'), sg.Checkbox('puncture', key = 'f_Puncture'), sg.Checkbox('impact', key = 'f_Impact')],
-                    [sg.Text('Weapon Class '), sg.Checkbox('rifle', key = 'f_Rifle'), sg.Checkbox('shotgun', key = 'f_Shotgun'), sg.Checkbox('sniper', key = 'f_Sniper')]]
+                    [sg.Text('Weapon Class '), sg.Checkbox('rifle', key = 'f_Rifle'), sg.Checkbox('shotgun', key = 'f_Shotgun'), sg.Checkbox('sniper', key = 'f_Sniper')],
+                    [sg.Button('Update List')],
+                    [sg.Text('Items: '), sg.Listbox(filteredResult, key ='filteredResult', enable_events=True, size= (60,10))]]
 
 
 
-# ----------- Create actual layout using Columns and a row of Buttons
+# ----------- Create full layout using Columns and a row of Buttons
 layout = [[sg.Column(layout1, key='-COL1-'), 
            sg.Column(layout2, visible=False, key='-COL2-'), 
            sg.Column(layout3, visible=False, key ='-COL3-'),
@@ -72,7 +76,10 @@ window = sg.Window('Warframe App', layout, size =(800,600))
 
 layout = 1  # The currently visible layout
 while True:
+    
     event, values = window.read()
+    print(event)
+    
     if event in (None, 'Exit'):
         break
     if event == 'Cycle Layout':
@@ -109,22 +116,43 @@ while True:
             print('Melee Weapon Selected: ' + values['meleeSelect'])
             sg.popup('Loadout', "Primary weapon: " + values['primarySelect'] +"\nSecondary Weapon: "+ values['secondarySelect'] +"\nMelee Weapon: "+ values['meleeSelect'] +"\nWarframe: "+ values['warframeSelect'] +"\nLoadout Number: "+values['allLoadouts'])
 
+
+    # Don't think these are necessary, the update button triggers the event, not the list selection
     elif event == 'editedWeapon':
         pass
     elif event == 'editedWarframe':
         pass
 
+
+
     elif event == 'UpdateWeapon':
-        window[f'-COL2-'].update(visible=False)
-        window[f'-EditWeapon-'].update(visible=True)
+        verified = 1
+        if (values['editedWeapon'] == ''):
+            verified = 0
+            sg.popup('ERROR: Please Select a Weapon Before Editing.')
+        if verified == 1:
+            window[f'-COL2-'].update(visible=False)
+            window[f'-EditWeapon-'].update(visible=True)
 
     elif event == 'UpdateWarframe':
-        window[f'-COL2-'].update(visible=False)
-        window[f'-EditWeapon-'].update(visible=True)
+        verified = 1
+        if (values['editedWarframe'] == ''):
+            verified = 0
+            sg.popup('ERROR: Please Select a Warframe Before Editing.')
+        if verified == 1:
+            window[f'-COL2-'].update(visible=False)
+            window[f'-EditWeapon-'].update(visible=True)
 
     elif event == 'Back':
         window[f'-EditWeapon-'].update(visible=False)
         window[f'-EditWarframe-'].update(visible=False)
         window[f'-COL2-'].update(visible=True)
-
+        
+# --------------------FILTERS-------------------- 
+    elif event == 'f_Name':
+        filteredResult.sort()
+        window['filteredResult'].Update(filteredResult)
+        
+    elif event == 'Update List':
+        pass
 window.close()
