@@ -1,6 +1,6 @@
 #!/bin/bash
 
-db="warframeDB.sqlite"
+db="warframeproject.sqlite"
 rm -f ${db}
 touch ${db}
 
