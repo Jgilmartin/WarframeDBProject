@@ -288,4 +288,8 @@ SELECT * FROM weaponsM
 UNION 
 SELECT * FROM weaponsP
 UNION 
-SELECT * FROM weaponsS
+SELECT * FROM weaponsS;
+
+DELETE FROM filterView 
+WHERE wp_class == 'secondary'
+OR wp_class == 'melee';
