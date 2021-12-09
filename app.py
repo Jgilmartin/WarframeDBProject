@@ -25,7 +25,8 @@ meleeWeaponsFireTypes = c.execute('SELECT wp_fireType FROM weaponsP').fetchall()
 meleeWeaponsNoise = c.execute('SELECT wp_noise FROM weaponsP').fetchall()
 warframeNames = c.execute('SELECT DISTINCT wf_name FROM warframe').fetchall()
 allWeapons = meleeWeapons + primaryWeapons + secondaryWeapons
-
+allItems = allWeapons + warframeNames
+filteredResult = allItems
 
 
 # ----------- Create the 3 layouts this Window will display -----------
@@ -126,6 +127,14 @@ testHeadings = ['Heading 1', 'Heading 2']
 
 layout6 = [[sg.Text('Loadout Viewer', key = 'test1')], [sg.Table(values = testList, headings=testHeadings)]]
 
+ItemViewAndFilters =[[sg.Text('Item View and Filters')], 
+                    [sg.Text('Sort By'), sg.Button('Name', key = 'f_Name'), sg.Button('Damage Type', key = 'f_DamageType'), sg.Button('Fire Rate', key = 'f_FireRate'), sg.Button('Noise', key = 'f_Noise')],
+                    [sg.Text('Filter By: '), sg.Checkbox('Warfames', key = 'f_Warframes'), sg.Checkbox('Weapons', key = 'f_Weapons'), sg.Checkbox('Primary', key = 'f_Primary'), sg.Checkbox('Secondary', key = 'f_Secondary'), sg.Checkbox('Melee', key = 'f_Melee')],
+                    [sg.Text('Damge Type '), sg.Checkbox('electric', key = 'f_Electric'), sg.Checkbox('heat', key = 'f_Heat'), sg.Checkbox('magnetic', key = 'f_Magnetic'), sg.Checkbox('radiation', key = 'f_Radiation'), sg.Checkbox('slash', key = 'f_Slash'), sg.Checkbox('puncture', key = 'f_Puncture'), sg.Checkbox('impact', key = 'f_Impact')],
+                    [sg.Text('Weapon Class '), sg.Checkbox('rifle', key = 'f_Rifle'), sg.Checkbox('shotgun', key = 'f_Shotgun'), sg.Checkbox('sniper', key = 'f_Sniper')],
+                    [sg.Button('Update List')],
+                    [sg.Text('Items: '), sg.Listbox(filteredResult, key ='filteredResult', enable_events=True, size= (60,10))]]
+
 weaponEditLayout = [[sg.Button('Back')]]
 
 warframeEditLayout = [[sg.Button('Back')]]
@@ -139,8 +148,9 @@ layout = [[sg.Column(layout1, key='-COL1-'),
            sg.Column(layout5, visible=False, key='-COL5-'),
            sg.Column(layout6, visible=False, key ='-COL6-'),
            sg.Column(weaponEditLayout, visible=False, key ='-EditWeapon-'),
-           sg.Column(warframeEditLayout, visible=False, key ='-EditWarframe-')],
-          [sg.Button('1'), sg.Button('2'), sg.Button('3'), sg.Button('4'), sg.Button('5'), sg.Button('6'),sg.Button('Exit')]]
+           sg.Column(warframeEditLayout, visible=False, key ='-EditWarframe-'),
+           sg.Column(ItemViewAndFilters, visible=False, key = '-COL7-')],
+          [sg.Button('1', size = (4, 1)), sg.Button('2', size = (4, 1)), sg.Button('3', size = (4, 1)), sg.Button('4', size = (4, 1)), sg.Button('5', size = (4, 1)), sg.Button('6', size = (4, 1)),sg.Button('7', size = (4, 1)),sg.Button('Exit')]]
 
 
 window = sg.Window('Warframe App', layout, size =(1000,800))
@@ -158,7 +168,7 @@ while True:
         layout = layout + 1 if layout < 6 else 1
         window[f'-COL{layout}-'].update(visible=True)
 
-    elif event in '123456':
+    elif event in '1234567':
         window[f'-COL{layout}-'].update(visible=False)
         layout = int(event)
         window[f'-COL{layout}-'].update(visible=True)
@@ -201,7 +211,6 @@ while True:
     elif event == 'editedWarframe':
         pass
 
-
     elif event == 'UpdateWeaponStatsPrimary':
         window[f'-COL2-'].update(visible=False)
         window[f'-EditWeapon-'].update(visible=True)
@@ -220,6 +229,10 @@ while True:
         window[f'-EditWeapon-'].update(visible=False)
         window[f'-EditWarframe-'].update(visible=False)
         window[f'-COL2-'].update(visible=True)
+
+    elif event == 'f_Name':
+        filteredResult.sort()
+        window['filteredResult'].Update(filteredResult)
 
 window.close()
 query = "UPDATE weaponsS SET wp_name = '"+ values['editedWeaponS'] +"',wp_DamageTypes = '"+ values['DamageTypeS'] +"', wp_fireRate = '"+ values['fireRateS'] +"', wp_fireType = '"+ values['fireTypeS'] +"', wp_noise = '"+ values['noiseS'] +"' WHERE wp_name = '"+values['editedWeaponS']+ "';"
