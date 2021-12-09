@@ -1,3 +1,4 @@
+from ctypes import sizeof
 from sqlite3 import dbapi2
 import PySimpleGUI as sg
 import sqlite3 as db
@@ -8,26 +9,38 @@ conn = db.connect('warframeproject.sqlite')
 conn.row_factory = lambda cursor, row: row[0]
 c = conn.cursor()
 allLoadouts = c.execute('SELECT l_name FROM loadouts').fetchall()
+
 primaryWeapons = c.execute('SELECT wp_name FROM weaponsP').fetchall()
 primaryWeaponsDamageTypes = c.execute('SELECT wp_DamageTypes FROM weaponsP').fetchall()
 primaryWeaponsFireRate = c.execute('SELECT wp_fireRate FROM weaponsP').fetchall()
 primaryWeaponsFireTypes = c.execute('SELECT wp_fireType FROM weaponsP').fetchall()
 primaryWeaponsNoise = c.execute('SELECT wp_noise FROM weaponsP').fetchall()
+
 secondaryWeapons = c.execute('SELECT wp_name FROM weaponsS').fetchall()
 secondaryWeaponsDamageTypes = c.execute('SELECT wp_DamageTypes FROM weaponsS').fetchall()
 secondaryWeaponsFireRate = c.execute('SELECT wp_fireRate FROM weaponsS').fetchall()
 secondaryWeaponsFireTypes = c.execute('SELECT wp_fireType FROM weaponsP').fetchall()
 secondaryWeaponsNoise = c.execute('SELECT wp_noise FROM weaponsP').fetchall()
+
 meleeWeapons = c.execute('SELECT wp_name FROM weaponsM').fetchall()
 meleeWeaponsDamageTypes = c.execute('SELECT wp_DamageTypes FROM weaponsS').fetchall()
 meleeWeaponsFireRate = c.execute('SELECT wp_fireRate FROM weaponsS').fetchall()
 meleeWeaponsFireTypes = c.execute('SELECT wp_fireType FROM weaponsP').fetchall()
 meleeWeaponsNoise = c.execute('SELECT wp_noise FROM weaponsP').fetchall()
 warframeNames = c.execute('SELECT DISTINCT wf_name FROM warframe').fetchall()
+
 allWeapons = meleeWeapons + primaryWeapons + secondaryWeapons
 allItems = allWeapons + warframeNames
 filteredResult = allItems
-
+loadoutNames = c.execute('SELECT l_name FROM loadouts').fetchall()
+loadoutPrimaries = c.execute('SELECT l_primaryWeapon FROM loadouts').fetchall()
+loadoutSecondaries = c.execute('SELECT l_secondaryWeapon FROM loadouts').fetchall()
+loadoutMelee = c.execute('SELECT l_meleeWeapon FROM loadouts').fetchall()
+loadoutWarframe = c.execute('SELECT l_warframe FROM loadouts').fetchall()
+result = c.execute('SELECT * FROM weaponsS').fetchall()
+loadoutViewList = [loadoutNames, loadoutPrimaries]
+#, , loadoutSecondaries, loadoutMelee, loadoutWarframe]
+loadoutViewHeadings = 'Loadout Name       Primary Weapon      Secondary Weapon    Melee Weapon    Warframe'
 
 # ----------- Create the 3 layouts this Window will display -----------
 layout1 = [[sg.Text('Loadout Select')],*[[sg.Combo(allLoadouts, key = 'allLoadouts', enable_events=True)]], 
@@ -122,10 +135,13 @@ layout5 = [[sg.Text('Warframe Editor ')],
            #[sg.Button('UpdateWarframe')],
            #[sg.Button('AddWaframe')]]
 
-testList = [['string', 'another string'], [2]]
-testHeadings = ['Heading 1', 'Heading 2']
 
-layout6 = [[sg.Text('Loadout Viewer', key = 'test1')], [sg.Table(values = testList, headings=testHeadings)]]
+
+layout6 = [[sg.Text('Loadout Viewer', key = 'test1')], 
+            [sg.Text(loadoutViewHeadings)],
+            [sg.Listbox(loadoutNames, size= (15,30) ,no_scrollbar=True), sg.Listbox(loadoutPrimaries, size= (15,30), no_scrollbar=True, key = 'l_primaries'), 
+            sg.Listbox(loadoutSecondaries, size= (15,30), no_scrollbar=True, key = 'l_secondaries'), sg.Listbox(loadoutMelee, size= (15,30), no_scrollbar=True, key = 'l_melee'), sg.Listbox(loadoutWarframe, size= (15,30), no_scrollbar=True, key = 'l_warframes')],
+            ]
 
 ItemViewAndFilters =[[sg.Text('Item View and Filters')], 
                     [sg.Text('Sort By'), sg.Button('Name', key = 'f_Name'), sg.Button('Damage Type', key = 'f_DamageType'), sg.Button('Fire Rate', key = 'f_FireRate'), sg.Button('Noise', key = 'f_Noise')],
@@ -174,8 +190,20 @@ while True:
         window[f'-COL{layout}-'].update(visible=True)
         
         if event == '6':
+            newloadoutNames = c.execute('SELECT l_name FROM loadouts').fetchall()
+            newloadoutPrimaries = c.execute('SELECT l_primaryWeapon FROM loadouts').fetchall()
+            newloadoutSecondaries = c.execute('SELECT l_secondaryWeapon FROM loadouts').fetchall()
+            newloadoutMelee = c.execute('SELECT l_meleeWeapon FROM loadouts').fetchall()
+            newloadoutWarframe = c.execute('SELECT l_warframe FROM loadouts').fetchall()
             result = c.execute('SELECT * FROM weaponsS').fetchall()
+            window['l_primaries'].Update(values=newloadoutPrimaries)
+            window['l_secondaries'].Update(values=newloadoutSecondaries)
+            window['l_melee'].Update(values=newloadoutMelee)
+            window['l_warframes'].Update(values=newloadoutWarframe)
             print(result)
+        if event == 7:
+            pass
+            
 
 
 

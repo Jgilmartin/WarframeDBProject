@@ -60,6 +60,7 @@ CREATE TABLE warframe_speed (
 );
 
 
+
 CREATE TABLE loadouts( 
     l_id, 
     l_name, l_primaryWeapon, l_secondaryWeapon, l_meleeWeapon, l_warframe,
@@ -281,3 +282,10 @@ WHERE warframe.wf_id >=0;
 
 UPDATE loadouts SET l_primaryweapon = 't1', l_secondaryWeapon = 't', l_meleeWeapon = 't', l_warframe = 't'
 WHERE l_name = 'Loadout 1';
+
+CREATE TABLE filterView AS 
+SELECT * FROM weaponsM
+UNION 
+SELECT * FROM weaponsP
+UNION 
+SELECT * FROM weaponsS
