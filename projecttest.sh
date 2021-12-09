@@ -1,7 +1,7 @@
 #!/bin/bash
 
-db="warframeDB.sqlite"
+db="warframeproject.sqlite"
 rm -f ${db}
 touch ${db}
 
-sqlite3 ${db} < projectWarframe.sql
+sqlite3 ${db} < projectwarframe.sql
