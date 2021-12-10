@@ -293,3 +293,6 @@ SELECT * FROM weaponsS;
 DELETE FROM filterView 
 WHERE wp_class == 'secondary'
 OR wp_class == 'melee';
+
+DELETE FROM filterView WHERE wp_name IN (SELECT wp_name from filterView WHERE wp_id == 99 AND wp_class != 'secondary' AND wp_class != 'melee' );
+DELETE FROM filterView WHERE wp_name IN (SELECT wp_name from filterView WHERE wp_id == 99 AND wp_class == 'secondary' AND wp_class == 'melee' );

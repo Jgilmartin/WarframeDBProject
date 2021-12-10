@@ -43,6 +43,7 @@ for i in range(0,13):
 print (filterSelections)
 
 def resetFilterView():
+    print('reset')
     c.execute('DROP TABLE filterView')
     c.execute(""" 
     CREATE TABLE filterView AS 
@@ -50,9 +51,11 @@ def resetFilterView():
     UNION 
     SELECT * FROM weaponsP
     UNION 
-    SELECT * FROM weaponsS;""")
+    SELECT * FROM weaponsS;
+    """)
+    print('reached')
+    c.execute("INSERT INTO filterView(wp_id, wp_name, wp_class, wp_DamageTypes, wp_fireRate, wp_fireType, wp_noise) VALUES ('99', '', '', '', '', '', '')")
     conn.commit()
-
 
 #, , loadoutSecondaries, loadoutMelee, loadoutWarframe]
 loadoutViewHeadings = 'Loadout Name       Primary Weapon      Secondary Weapon    Melee Weapon    Warframe'
@@ -172,7 +175,7 @@ ItemViewAndFilters =[[sg.Text('Item View and Filters')],
                     [sg.Text('Filter By: '), sg.Checkbox('Primary', key = 'f_Primary'), sg.Checkbox('Secondary', key = 'f_Secondary'), sg.Checkbox('Melee', key = 'f_Melee')],
                     [sg.Text('Damge Type '), sg.Checkbox('electric', key = 'f_Electric'), sg.Checkbox('heat', key = 'f_Heat'), sg.Checkbox('magnetic', key = 'f_Magnetic'), sg.Checkbox('radiation', key = 'f_Radiation'), sg.Checkbox('slash', key = 'f_Slash'), sg.Checkbox('puncture', key = 'f_Puncture'), sg.Checkbox('impact', key = 'f_Impact')],
                     [sg.Text('Weapon Class '), sg.Checkbox('rifle', key = 'f_Rifle'), sg.Checkbox('shotgun', key = 'f_Shotgun'), sg.Checkbox('sniper', key = 'f_Sniper')],
-                    [sg.Button('Update List'), sg.Text('Items: ')], 
+                    [sg.Button('Update List'), sg.Text('Items:     '), sg.Text('Weapon Class:    '), sg.Text('DamageType:    '), sg.Text('Fire Rate:  ')], 
                     [sg.Text('       '), sg.Listbox(filNames, key ='filNames', enable_events=True, size= (15,35), no_scrollbar=True ),
                      sg.Listbox(filClass, key ='filClass', enable_events=True, size= (15,35), no_scrollbar=True ),
                      sg.Listbox(filDamageTypes, key ='filDamageTypes', enable_events=True, size= (15,35), no_scrollbar=True ),
@@ -227,21 +230,57 @@ while True:
             window['l_secondaries'].Update(values=newloadoutSecondaries)
             window['l_melee'].Update(values=newloadoutMelee)
             window['l_warframes'].Update(values=newloadoutWarframe)
-            print(result)
 
-        if event == 7:
+        if event == '7':
             resetFilterView()
             
 
 
     
     elif event == 'Update List':
+        reset = True
+        for i in range(0,13):
+            if filterSelections[i] == True:
+                reset = False
+        if reset == True:
+            resetFilterView()
+
+        deleteQuery = "SELECT wp_name FROM filterView WHERE wp_id == 99"
         for i in range(0,13):
             print(values[(filterValues[i])])
+            print(i)
             if values[(filterValues[i])] == True:
-                filterSelections[i] == True
+                filterSelections[i] = True
             elif values[(filterValues[i])] == False:
-                filterSelections[i] == False
+                filterSelections[i] = False
+        
+        if filterSelections[0] == True and reset ==False: #Primary select
+            deleteQuery += " OR wp_class == 'secondary' OR wp_class == 'melee' "
+        elif filterSelections[1] == True and reset ==False: #Secondary Select
+                deleteQuery += " OR wp_class != 'secondary' "  
+        elif filterSelections[2] == True and reset ==False: #Secondary Select
+            pass 
+
+        if reset == False:
+            print(deleteQuery)
+            print("DELETE FROM filterView WHERE wp_name IN (" + deleteQuery + ")")
+            finalQuery = "DELETE FROM filterView WHERE wp_name IN (" + deleteQuery + ");"
+            c.execute(finalQuery)  
+            conn.commit()
+
+
+        newfilNames = c.execute('SELECT wp_name from filterView').fetchall()
+        newfilClass = c.execute('SELECT wp_class from filterView').fetchall()
+        newfilDamageTypes = c.execute('SELECT wp_DamageTypes from filterView').fetchall()
+        newfilFireRate = c.execute('SELECT wp_FireRate from filterView').fetchall()
+        newfilFireType = c.execute('SELECT wp_FireType from filterView').fetchall()
+        newfilNoise = c.execute('SELECT wp_noise from filterView').fetchall()
+
+        window['filNames'].Update(values=newfilNames)
+        window['filClass'].Update(values=newfilClass)
+        window['filDamageTypes'].Update(values=newfilDamageTypes)
+        window['filFireRate'].Update(values=newfilFireRate)
+        
 
 
     elif event == 'UpdateLoadout':
