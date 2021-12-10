@@ -258,8 +258,28 @@ while True:
             deleteQuery += " OR wp_class == 'secondary' OR wp_class == 'melee' "
         elif filterSelections[1] == True and reset ==False: #Secondary Select
                 deleteQuery += " OR wp_class != 'secondary' "  
-        elif filterSelections[2] == True and reset ==False: #Secondary Select
-            pass 
+        elif filterSelections[2] == True and reset ==False: #Melee Select
+                deleteQuery += " OR wp_class != 'melee' " 
+        if filterSelections[3] == True and reset ==False: #Electric Select
+                deleteQuery += " OR wp_DamageTypes NOT LIKE  '%electricity%' " 
+        elif filterSelections[4] == True and reset ==False: #Heat Select
+                deleteQuery += " OR wp_DamageTypes NOT LIKE '%heat%' " 
+        elif filterSelections[5] == True and reset ==False: #Magnetic Select
+                deleteQuery += " OR wp_DamageTypes NOT LIKE '%magnetic%' " 
+        elif filterSelections[6] == True and reset == False: #Radiation Select
+            deleteQuery += " OR wp_DamageTypes NOT LIKE '%radiation%' "
+        elif filterSelections[7] == True and reset == False: #Slash Select
+            deleteQuery += " OR wp_DamageTypes NOT LIKE '%slash%' "
+        elif filterSelections[8] == True and reset == False: #Puncture Select
+            deleteQuery += " OR wp_DamageTypes NOT LIKE '%puncture%' "
+        elif filterSelections[9] == True and reset == False: #Impact Select
+            deleteQuery += " OR wp_DamageTypes NOT LIKE '%impact%' "
+        elif filterSelections[10] == True and reset == False: #Rifle Select
+            deleteQuery += " OR wp_class NOT LIKE '%rifle%' "
+        elif filterSelections[11] == True and reset == False: #Shotgun Select
+            deleteQuery += " OR wp_class NOT LIKE '%shotgun%' "
+        elif filterSelections[12] == True and reset == False: #Sniper Select
+            deleteQuery += " OR wp_class NOT LIKE '%sniper%' "
 
         if reset == False:
             print(deleteQuery)
